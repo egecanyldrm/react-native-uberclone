@@ -4,7 +4,6 @@ import Home from './src/screens/Home';
 import Map from './src/screens/Map';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
