@@ -1,16 +1,25 @@
-#  React Native Reanimated Todo App
-
+#  React Native Uber Clone App
 
 ####  Libraries
-- React native reanimated 
-- React gesture handler 
+- Native Wind (Tailwind CSS) 
+- React Native Maps
+- React Navigation 
+- Zustand (State Management)
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file.
+Google Cloud API key has to enabled access at the below APIs: 
+- Distance Matrix API
+- Directions API
+- Places API
 
 ## Screenshots
 <div>
 
 <img  alt="Screenshot"  src="./resources/Home.gif" height="500" width="250" />
-<img alt="Screenshot"  src="./resources/Screenshot_1.png" height="500" width="250" />
-<img alt="Screenshot"  src="./resources/Screenshot_2.png" height="500" width="250" />
-<img alt="Screenshot"  src="./resources/Screenshot_3.png" height="500" width="250" />
+<img alt="Screenshot"  src="./resources/Home.png" height="500" width="250" />
+<img alt="Screenshot"  src="./resources/Step1.png" height="500" width="250" />
+<img alt="Screenshot"  src="./resources/Step2.png" height="500" width="250" />
 
 </div>

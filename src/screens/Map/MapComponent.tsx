@@ -1,6 +1,6 @@
 import { StyleSheet, } from 'react-native'
 import React, { useEffect, useRef } from 'react'
-import MapView, { Marker, MapViewProps } from 'react-native-maps'
+import MapView, { Marker } from 'react-native-maps'
 import { useZustandStore } from '../../store/zustand';
 import { shallow } from 'zustand/shallow'
 import MapViewDirections from 'react-native-maps-directions';
@@ -41,11 +41,11 @@ const MapComponent = () => {
             initialRegion={initalRegion}
         >
             {
-                origin ?
+                origin?.geometry ?
                     <Marker
                         coordinate={{
-                            latitude: origin?.lat,
-                            longitude: origin?.lng,
+                            latitude: origin.geometry.location.lat,
+                            longitude: origin.geometry.location.lng,
                         }}
                         title='Origin'
                         identifier='origin'
@@ -53,21 +53,21 @@ const MapComponent = () => {
                     /> : null
             }
             {
-                destination ?
+                destination?.geometry ?
                     <Marker
                         coordinate={{
-                            latitude: destination.lat,
-                            longitude: destination.lng
+                            latitude: destination.geometry.location.lat,
+                            longitude: destination.geometry.location.lng
                         }}
                         title='Destination'
                         identifier='destination'
                     /> : null
             }
             {
-                (origin && destination) ?
+                (origin?.geometry && destination?.geometry) ?
                     <MapViewDirections
-                        origin={{ latitude: origin?.lat, longitude: origin.lng }}
-                        destination={{ latitude: destination?.lat, longitude: destination?.lng }}
+                        origin={{ latitude: origin?.geometry.location.lat, longitude: origin.geometry.location.lng }}
+                        destination={{ latitude: destination?.geometry.location.lat, longitude: destination?.geometry.location.lng }}
                         apikey={GOOGLE_MAPS_APIKEY}
                         strokeWidth={3}
                         strokeColor='black'

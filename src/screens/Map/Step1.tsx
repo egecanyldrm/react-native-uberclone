@@ -1,18 +1,17 @@
-import React, { useCallback, useRef, useState } from 'react'
-import { TextInput, TextInputProps } from 'react-native-paper';
-import { Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { TextInput } from 'react-native-paper';
+import { Alert, Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import axios from 'axios';
 import 'react-native-gesture-handler';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
-import { IOption } from '../../types';
+import { ILocation } from '../../types';
 import { shallow } from 'zustand/shallow'
 import { useZustandStore } from '../../store/zustand';
 
 const Step1 = ({ navigation }: any): JSX.Element => {
 
     // ** States
-    const [options, setOptions] = useState<IOption[]>([])
+    const [options, setOptions] = useState<ILocation[]>([])
     const [focus, setFocus] = useState<'from' | 'where' | string>('')
     const [fromToValue, setFromToValue] = useState<string>('')
     const [whereToValue, setWhereToValue] = useState<string>('')
@@ -21,46 +20,75 @@ const Step1 = ({ navigation }: any): JSX.Element => {
     //@ts-ignore
     const whereInputRef = useRef<TextInput | null>(null)
 
-
     // ** Store
-    const { setOrigin, setDestination } = useZustandStore(
-        (state) => ({ setOrigin: state.setOrigin, setDestination: state.setDestination, }),
+    const { origin, destination, setOrigin, setDestination } = useZustandStore(
+        (state) => ({
+            origin: state.origin,
+            destination: state.destination,
+            setOrigin: state.setOrigin,
+            setDestination: state.setDestination,
+        }),
         shallow
-    )
+    );
+
+    // ** Side Effects 
+    useEffect(() => {
+        async function navigateToStep2() {
+            Keyboard.dismiss();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            navigation.navigate('Step2');
+        }
+        if (origin && destination) navigateToStep2();
+
+    }, [origin, destination])
+
 
     // **  Handler Functions 
     const handleChangeFromInput = useCallback((text: string) => {
         setFromToValue(text);
-        handleFetchLocation(text);
+        optimizedFn(text)
     }, [])
     const handleChangeWhereInput = useCallback((text: string) => {
         setWhereToValue(text);
-        handleFetchLocation(text);
+        optimizedFn(text)
     }, [])
 
     const handleFetchLocation = useCallback(async (text: string) => {
         if (text.length < 3) return
-        const query = text.trim().split(' ').join('%2C')
+        const query = text.trim().split(' ').join('%2C').toLocaleLowerCase();
         try {
             const request = await axios.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=name%2Cgeometry&input=${query}&inputtype=textquery&key=${process.env.API_KEY}`)
             setOptions(request.data?.candidates);
         } catch (err) {
-            console.log(err)
+            Alert.alert('Something went wrong', "We couldn't fetch location ")
         }
     }, [])
-    const handleOptionSelect = useCallback((option: IOption) => {
+
+    const handleOptionSelect = useCallback((option: ILocation) => {
         if (focus === 'from') {
             setFromToValue(option.name);
-            setOrigin(option.geometry.location);
+            setOrigin(option);
             whereInputRef?.current?.focus()
         } else {
             setWhereToValue(option.name);
-            setDestination(option.geometry.location);
-            if (fromToValue) navigation.navigate('Step2')
-
+            setDestination(option);
         }
         setOptions([])
-    }, [focus, fromToValue]);
+    }, [focus,]);
+
+    const debounce = (func: any) => {
+        let timer: any;
+        return function (...args: any) {
+            //@ts-ignore
+            const context = this;
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                timer = null;
+                func.apply(context, args);
+            }, 1500);
+        };
+    };
+    const optimizedFn = useCallback(debounce(handleFetchLocation), []);
 
     return (
         <TouchableWithoutFeedback className='flex-1' onPress={Keyboard.dismiss} >
@@ -76,8 +104,10 @@ const Step1 = ({ navigation }: any): JSX.Element => {
                         mode='outlined'
                         activeOutlineColor='#000'
                         right={fromToValue.length ?
-                            <TextInput.Icon size={18} icon={'close'} onPress={() => { setFromToValue(''); }} />
-                            : null
+                            <TextInput.Icon size={18} icon={'close'} onPress={() => {
+                                setFromToValue('');
+                                setOrigin(undefined)
+                            }} /> : null
                         }
                     />
                     <TextInput
@@ -89,9 +119,11 @@ const Step1 = ({ navigation }: any): JSX.Element => {
                         value={whereToValue}
                         onFocus={() => setFocus('where')}
                         onChangeText={handleChangeWhereInput}
-                        right={whereToValue.length ? <TextInput.Icon size={18} icon={'close'} onPress={() => {
-                            setWhereToValue('');
-                        }} /> : null
+                        right={whereToValue.length ?
+                            <TextInput.Icon size={18} icon={'close'} onPress={() => {
+                                setWhereToValue('');
+                                setDestination(undefined)
+                            }} /> : null
                         }
                     />
                 </View>
@@ -103,7 +135,7 @@ const Step1 = ({ navigation }: any): JSX.Element => {
                                 <TouchableOpacity key={key} onPress={() => handleOptionSelect(option)}  >
                                     <View className='flex-row gap-1 items-center border-b border-gray-200 py-2'>
                                         <Ionicons name='location-outline' size={20} />
-                                        <Text className='  font-bold' >{option?.name} </Text>
+                                        <Text className='font-bold' >{option?.name} </Text>
                                     </View>
                                 </TouchableOpacity>
                             )

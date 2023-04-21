@@ -11,10 +11,7 @@ export default function App() {
     <NavigationContainer>
       <SafeAreaProvider>
         <PaperProvider>
-          <Stack.Navigator
-            initialRouteName='Home'
-            screenOptions={{ headerShown: false }}
-          >
+          <Stack.Navigator initialRouteName='Home' screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Map" component={Map} />
           </Stack.Navigator>

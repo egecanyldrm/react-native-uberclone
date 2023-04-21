@@ -2,15 +2,6 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-   // Path alias config
-  //  "baseUrl": ".",
-  //   "paths": {
-  //     "*": ["src/*"],
-  //     "@components/*": ["src/components/*"],
-  //     "@screens/*": ["src/screens/*"],
-  //     "@hooks/*": ["src/hooks/*"],
-  // },
-   
     "allowSyntheticDefaultImports": true,
     "jsx": "react-native",
     "lib": [
@@ -23,5 +14,4 @@
     "resolveJsonModule": true,
   },
   "exclude": ["node_modules"],
-
 }

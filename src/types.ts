@@ -6,13 +6,10 @@ export interface IRegion {
 }
 
 export interface ILocation {
-    lat: number;
-    lng: number;
+    geometry: IGeometry;
+    name: string;
 }
-export interface IUserLocation {
-    latitude: number,
-    longitude: number
-}
+
 interface IGeometryLocation {
     lat: number;
     lng: number;
@@ -26,3 +23,16 @@ export interface IOption {
     name: string;
 }
 
+interface JourneyDistance {
+    text: string;
+    value: number;
+}
+interface JourneyDuration {
+    text: string;
+    value: number
+}
+
+export interface IJourneyInfo {
+    distance: JourneyDistance;
+    duration: JourneyDuration;
+}
